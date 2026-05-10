@@ -143,6 +143,39 @@ app.get("/api/cart", async (req, res) => {
   res.json(cart);
 });
 
+/* UPDATE QUANTITY */
+app.put("/api/cart/:id", async (req, res) => {
+
+  const { action } = req.body;
+
+  const item = await Cart.findById(req.params.id);
+
+  if (!item) {
+    return res.json({ message: "Item not found ❌" });
+  }
+
+  // INCREASE
+  if (action === "increase") {
+    item.quantity += 1;
+  }
+
+  // DECREASE
+  if (action === "decrease") {
+
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    }
+
+  }
+
+  // UPDATE TOTAL
+  item.total = item.price * item.quantity;
+
+  await item.save();
+
+  res.json(item);
+
+});
 // DELETE CART ITEM
 app.delete("/api/cart/:id", async (req, res) => {
   await Cart.findByIdAndDelete(req.params.id);
